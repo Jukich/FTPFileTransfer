@@ -1,0 +1,230 @@
+﻿<UserControl x:Class="FTPFileManagament.FileExplorer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FTPFileManagament"
+        mc:Ignorable="d"  Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <!--<Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>-->
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListView x:Name="lvFIlesDirs" SourceUpdated="lvFIlesDirs_SourceUpdated"  Margin="0,0,0,40"  Grid.Column="0" 
+                      ItemsSource="{Binding RemoteFiles, Source={x:Static local:FilesConfig.Instance}}" KeyDown="lvFIlesDirs_KeyDown">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn  Header="Name"  >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="img" Visibility="Visible" Width="25" Height="25"  Margin="0 0 2 0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        <TextBlock Text="{Binding FName}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding FileFormat}" Value="docx">
+                                            <Setter TargetName="img" Property="Source" Value="/Images/imgWord.png" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding FileFormat}" Value="txt">
+                                            <Setter TargetName="img" Property="Source" Value="/Images/imgTxt.png" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding FileFormat}" Value="pdf">
+                                            <Setter TargetName="img" Property="Source" Value="/Images/imgPDF.png" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding FileFormat}" Value="Drive">
+                                            <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn  Header="Type" DisplayMemberBinding="{Binding FileFormat}"/>
+                        <GridViewColumn  Header="Size" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock  HorizontalAlignment="Stretch" Text="{Binding LastVersion.FileSize}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Last Modified" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Stretch" Text="{Binding LastVersion.LastMod}" TextAlignment="Center"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="FTP Connection" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Stretch" Text="{Binding ConnName }" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <!--<GridViewColumn Header="Date modified" DisplayMemberBinding="{Binding LastModDate }"/>-->
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="lvFIlesDirs_MouseDoubleClick" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+            <Border  Grid.Column="0" Height="41" BorderThickness="1,1,1,1" BorderBrush="DimGray"  VerticalAlignment="Bottom">
+                <Button x:Name="btnAddFile" Height="30" Width="130" Content="Add File" Margin="20,0,0,0" Click="btnAddFile_Click" Style="{StaticResource UniversalButton_Style}"/>
+            </Border>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+
+            <DataGrid Grid.Column="2" ItemsSource="{Binding SelectedItem.FileVersions, ElementName=lvFIlesDirs}" Background="Transparent" 
+                      GridLinesVisibility="None" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="*" HeadersVisibility="Column">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Size" Binding="{Binding FileSize}" Width="auto" FontSize="13" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Last Modified" Binding="{Binding LastMod}" Width="auto" FontSize="13" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Descr}" FontSize="13" />
+                </DataGrid.Columns>
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Foreground" Value="Black" />
+                                <Setter Property="Background" Value="#FFBDE6FF" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="BorderThickness" Value="5" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type DataGridRow}">
+                                    <Border x:Name="DGR_Border" BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                        Background="{TemplateBinding Background}" 
+                                        SnapsToDevicePixels="True"
+                                        CornerRadius="2">
+                                        <SelectiveScrollingGrid>
+                                            <SelectiveScrollingGrid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </SelectiveScrollingGrid.ColumnDefinitions>
+                                            <SelectiveScrollingGrid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </SelectiveScrollingGrid.RowDefinitions>
+                                            <DataGridCellsPresenter Grid.Column="1" ItemsPanel="{TemplateBinding ItemsPanel}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            <DataGridDetailsPresenter Grid.Column="1" Grid.Row="1" SelectiveScrollingGrid.SelectiveScrollingOrientation="{Binding AreRowDetailsFrozen, ConverterParameter={x:Static SelectiveScrollingOrientation.Vertical}, Converter={x:Static DataGrid.RowDetailsScrollingConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" Visibility="{TemplateBinding DetailsVisibility}"/>
+                                            <DataGridRowHeader Grid.RowSpan="2" SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical" Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Row}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                                        </SelectiveScrollingGrid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#FFBDE6FF" />
+                                <Setter Property="BorderBrush" Value="#FFBDE6FF" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+               
+            </DataGrid>
+            <ListView x:Name="lvVersions"  Grid.Column="2" ItemsSource="{Binding SelectedItem.FileVersions, ElementName=lvFIlesDirs}" Margin="0,0,0,0" Visibility="Collapsed" >
+                <ListView.View>
+                    <GridView>
+                        <!--<GridViewColumn  Header="Name"  >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image x:Name="img" Visibility="Collapsed" Width="16" Height="16" Source="/Images/folder.png" Margin="0 0 2 0" />
+                                    <TextBlock Text="{Binding FName}" />
+                                </StackPanel>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding FileFormat}" Value="Directory">
+                                        <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding FileFormat}" Value="Drive">
+                                        <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+            
+                        <GridViewColumn Header="Size" Width="100" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Stretch" Text="{Binding FileSize}" TextAlignment="Center" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn  Header="Last Modified" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Stretch" Text="{Binding LastMod}" TextAlignment="Center" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn  Header="Description"  Width="200">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextWrapping="WrapWithOverflow"  Text="{Binding Descr}" />
+                                    <!--<TextBox MinWidth="100"  HorizontalAlignment="Stretch" Background="Transparent" BorderBrush="Transparent"  Text="{Binding Descr}" TextAlignment="Left" >
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                                                            <Border 
+                                                                Name="Border"
+                                                                CornerRadius="2" 
+                                                                Padding="2"
+                                                                Background="Transparent"
+                                                                BorderBrush="Transparent"
+                                                                BorderThickness="1" >
+                                                                <ScrollViewer Margin="0" x:Name="PART_ContentHost"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsEnabled" Value="False">
+                                                                    <Setter TargetName="Border" Property="Background" Value="Transparent"/>
+                                                                    <Setter TargetName="Border" Property="BorderBrush" Value="Transparent"/>
+                                                                    <Setter Property="Foreground" Value="#888888"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>-->
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <!--<GridViewColumn Header="Date modified" DisplayMemberBinding="{Binding LastModDate }"/>-->
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="lvVersions_MouseDoubleClick" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
+        <Button x:Name="btnSwitchView"  Grid.Row="1" Height="30" Width="150" VerticalAlignment="Bottom" HorizontalAlignment="Right" 
+                Content="View Connections" Margin="0,0,8,8" Click="btnSwitchView_Click" Style="{StaticResource UniversalButton_Style}" />
+    </Grid>
+</UserControl>

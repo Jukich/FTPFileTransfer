@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="FTPClientDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="FTPConnectionInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConnName" Type="varchar" MaxLength="100" />
+          <Property Name="ConnIP" Type="varchar" MaxLength="100" />
+          <Property Name="ConnPort" Type="int" />
+          <Property Name="ConnUsername" Type="varchar" MaxLength="100" />
+          <Property Name="ConnPassword" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="FTPFileInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConnId" Type="int" Nullable="false" />
+          <Property Name="FName" Type="varchar" MaxLength="100" />
+          <Property Name="FileFormat" Type="varchar" MaxLength="100" />
+          <Property Name="RemotePath" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="FTPFileVersions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FileId" Type="int" Nullable="false" />
+          <Property Name="FileVersion" Type="float" Nullable="false" />
+		  <Property Name="RemotePath" Type="varchar" MaxLength="100" />
+          <Property Name="Descr" Type="varchar" MaxLength="100" />
+          <Property Name="Size" Type="bigint" Nullable="false" />
+          <Property Name="LastModified" Type="bigint" Nullable="false" />
+          <Property Name="HashCode" Type="varbinary" MaxLength="32" />
+        </EntityType>
+        <Association Name="FK__FTPFileIn__ConnI__1332DBDC">
+          <End Role="FTPConnectionInfo" Type="Self.FTPConnectionInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FTPFileInfo" Type="Self.FTPFileInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FTPConnectionInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FTPFileInfo">
+              <PropertyRef Name="ConnId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__FTPFileVe__FileI__17036CC0">
+          <End Role="FTPFileInfo" Type="Self.FTPFileInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FTPFileVersions" Type="Self.FTPFileVersions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FTPFileInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FTPFileVersions">
+              <PropertyRef Name="FileId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FTPClientDBModelStoreContainer">
+          <EntitySet Name="FTPConnectionInfo" EntityType="Self.FTPConnectionInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FTPFileInfo" EntityType="Self.FTPFileInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FTPFileVersions" EntityType="Self.FTPFileVersions" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__FTPFileIn__ConnI__1332DBDC" Association="Self.FK__FTPFileIn__ConnI__1332DBDC">
+            <End Role="FTPConnectionInfo" EntitySet="FTPConnectionInfo" />
+            <End Role="FTPFileInfo" EntitySet="FTPFileInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__FTPFileVe__FileI__17036CC0" Association="Self.FK__FTPFileVe__FileI__17036CC0">
+            <End Role="FTPFileInfo" EntitySet="FTPFileInfo" />
+            <End Role="FTPFileVersions" EntitySet="FTPFileVersions" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FTPClientDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="FTPConnectionInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConnName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ConnIP" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ConnPort" Type="Int32" />
+          <Property Name="ConnUsername" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ConnPassword" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="FTPFileInfoes" Relationship="Self.FK__FTPFileIn__ConnI__1332DBDC" FromRole="FTPConnectionInfo" ToRole="FTPFileInfo" />
+        </EntityType>
+        <EntityType Name="FTPFileInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConnId" Type="Int32" Nullable="false" />
+          <Property Name="FName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FileFormat" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="RemotePath" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="FTPConnectionInfo" Relationship="Self.FK__FTPFileIn__ConnI__1332DBDC" FromRole="FTPFileInfo" ToRole="FTPConnectionInfo" />
+          <NavigationProperty Name="FTPFileVersions" Relationship="Self.FK__FTPFileVe__FileI__17036CC0" FromRole="FTPFileInfo" ToRole="FTPFileVersions" />
+        </EntityType>
+        <EntityType Name="FTPFileVersion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FileId" Type="Int32" Nullable="false" />
+          <Property Name="FileVersion" Type="Double" Nullable="false" />
+          <Property Name="RemotePath" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Descr" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Size" Type="Int64" Nullable="false" />
+          <Property Name="LastModified" Type="Int64" Nullable="false" />
+          <Property Name="HashCode" Type="Binary" MaxLength="32" FixedLength="false" />
+          <NavigationProperty Name="FTPFileInfo" Relationship="Self.FK__FTPFileVe__FileI__17036CC0" FromRole="FTPFileVersions" ToRole="FTPFileInfo" />
+        </EntityType>
+        <Association Name="FK__FTPFileIn__ConnI__1332DBDC">
+          <End Role="FTPConnectionInfo" Type="Self.FTPConnectionInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FTPFileInfo" Type="Self.FTPFileInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FTPConnectionInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FTPFileInfo">
+              <PropertyRef Name="ConnId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__FTPFileVe__FileI__17036CC0">
+          <End Role="FTPFileInfo" Type="Self.FTPFileInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FTPFileVersions" Type="Self.FTPFileVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FTPFileInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FTPFileVersions">
+              <PropertyRef Name="FileId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FTPDBContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="FTPConnectionInfoes" EntityType="Self.FTPConnectionInfo" />
+          <EntitySet Name="FTPFileInfoes" EntityType="Self.FTPFileInfo" />
+          <EntitySet Name="FTPFileVersions" EntityType="Self.FTPFileVersion" />
+          <AssociationSet Name="FK__FTPFileIn__ConnI__1332DBDC" Association="Self.FK__FTPFileIn__ConnI__1332DBDC">
+            <End Role="FTPConnectionInfo" EntitySet="FTPConnectionInfoes" />
+            <End Role="FTPFileInfo" EntitySet="FTPFileInfoes" />
+          </AssociationSet>
+          <AssociationSet Name="FK__FTPFileVe__FileI__17036CC0" Association="Self.FK__FTPFileVe__FileI__17036CC0">
+            <End Role="FTPFileInfo" EntitySet="FTPFileInfoes" />
+            <End Role="FTPFileVersions" EntitySet="FTPFileVersions" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FTPClientDBModelStoreContainer" CdmEntityContainer="FTPDBContext">
+          <EntitySetMapping Name="FTPConnectionInfoes">
+            <EntityTypeMapping TypeName="FTPClientDBModel.FTPConnectionInfo">
+              <MappingFragment StoreEntitySet="FTPConnectionInfo">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ConnName" ColumnName="ConnName" />
+                <ScalarProperty Name="ConnIP" ColumnName="ConnIP" />
+                <ScalarProperty Name="ConnPort" ColumnName="ConnPort" />
+                <ScalarProperty Name="ConnUsername" ColumnName="ConnUsername" />
+                <ScalarProperty Name="ConnPassword" ColumnName="ConnPassword" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FTPFileInfoes">
+            <EntityTypeMapping TypeName="FTPClientDBModel.FTPFileInfo">
+              <MappingFragment StoreEntitySet="FTPFileInfo">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ConnId" ColumnName="ConnId" />
+                <ScalarProperty Name="FName" ColumnName="FName" />
+                <ScalarProperty Name="FileFormat" ColumnName="FileFormat" />
+                <ScalarProperty Name="RemotePath" ColumnName="RemotePath" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FTPFileVersions">
+            <EntityTypeMapping TypeName="FTPClientDBModel.FTPFileVersion">
+              <MappingFragment StoreEntitySet="FTPFileVersions">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FileId" ColumnName="FileId" />
+                <ScalarProperty Name="FileVersion" ColumnName="FileVersion" />
+				<ScalarProperty Name="RemotePath" ColumnName="RemotePath" />
+                <ScalarProperty Name="Descr" ColumnName="Descr" />
+                <ScalarProperty Name="Size" ColumnName="Size" />
+                <ScalarProperty Name="LastModified" ColumnName="LastModified" />
+                <ScalarProperty Name="HashCode" ColumnName="HashCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

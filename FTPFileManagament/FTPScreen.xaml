@@ -1,0 +1,164 @@
+﻿<UserControl x:Class="FTPFileManagament.FTPScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FTPFileManagament" Background="{Binding  Backgnd, RelativeSource={RelativeSource Self}}"
+        mc:Ignorable="d" Margin="-2">
+    <UserControl.Resources>
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Resources>
+    <Grid  Width="{Binding Width, RelativeSource={RelativeSource AncestorType=TabControl}}" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="12*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+
+        <ItemsControl  HorizontalAlignment="Left" x:Name="locdirs" Grid.Column="0" Grid.Row="0" ItemsSource="{Binding LocalDirsTree, RelativeSource={RelativeSource AncestorType=local:FTPScreen}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="btnDirChange" Click="btnLocDirChange_Click" BorderThickness="0" Tag="{Binding}"
+                                Content="{Binding Name, Converter={x:Static local:DirNamesConverter.Instance}}" Background="Transparent"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl  HorizontalAlignment="Left" x:Name="remdirs" Grid.Column="2" Grid.Row="0" ItemsSource="{Binding RemoteDirsTree, RelativeSource={RelativeSource AncestorType=local:FTPScreen}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="btnDirChange" Click="btnRemDirChange_Click" BorderThickness="0" Tag="{Binding}"
+                                Content="{Binding Name, Converter={x:Static local:DirNamesConverter.Instance}}" Background="Transparent"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ListView x:Name="lvLocalDirs" Grid.Row="1"  Grid.Column="0" ItemsSource="{Binding FilesLocal, RelativeSource={RelativeSource AncestorType=local:FTPScreen}}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn  Header="Name" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image x:Name="img" Visibility="Collapsed" Width="16" Height="16" Source="/Images/folder.png" Margin="0 0 2 0" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Type}" Value="Directory">
+                                            <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="Drive">
+                                            <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn  Header="Type" DisplayMemberBinding="{Binding Type}"/>
+                    <GridViewColumn Header="Size" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Stretch" Text="{Binding Size}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Date modified" DisplayMemberBinding="{Binding LastModDate }"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="lvLocalDirs_MouseDoubleClick" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <StackPanel Grid.Row="1"   Orientation="Vertical" Grid.Column="1" >
+            <Button x:Name="Refresh" Height="30" Width="100" Content="Refresh" Margin="0,0,0,10" Click="Refresh_Click"
+                    IsEnabled="{Binding CommandExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}"/>
+            <Button x:Name="btndonwload" Height="30" Width="50"  Margin="0,0,0,10"  Click="btndonwload_Click" Background="Transparent" BorderThickness="0"
+                IsEnabled="{Binding CommandExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}">
+                <Image Source="/Images/Download.png" Stretch="Uniform" ToolTip="Download"/>
+            </Button>
+            <Button x:Name="btnupload" Height="30" Width="50"  Margin="0,0,0,10"  Click="btnupload_Click"  Background="Transparent" BorderThickness="0"
+                    IsEnabled="{Binding CommandExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}">
+                <Image Source="/Images/Upload.png" Stretch="Uniform" ToolTip="Upload"/>
+            </Button>
+            <Button x:Name="btnAddDB" Height="30" Width="100" Content="Add To DB" Margin="0,0,0,10" Click="btnAddDB_Click"
+                    IsEnabled="{Binding CommandExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}"/>
+            <Grid Height="30" Margin="0,0,0,10" >
+                <ProgressBar x:Name="prg" Height="30" Width="120" Background="white" Value="{Binding Progress, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}}"
+                             Visibility="{Binding TrasferExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}},Converter={x:Static local:BoolToEnabled.Instance}}"/>
+                <TextBlock x:Name="txtprg" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Progress, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}}"
+                           Visibility="{Binding TrasferExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}"/>
+            </Grid>
+            <Button x:Name="btnCancel" Height="30" Content="Cancel" Width="100" Click="btnCancel_Click" 
+                    Visibility="{Binding TrasferExecuting, RelativeSource={RelativeSource AncestorType={x:Type local:FTPScreen}}, Converter={x:Static local:BoolToEnabled.Instance}}"/>
+        </StackPanel>
+        <ListView x:Name="lvRemoteDirs" Grid.Row="1"   Grid.Column="2" ItemsSource="{Binding FilesRemote, RelativeSource={RelativeSource AncestorType=local:FTPScreen}}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn  Header="Name" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image x:Name="img" Visibility="Collapsed" Width="16" Height="16" Source="/Images/folder.png" Margin="0 0 2 0" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Directory">
+                                        <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Drive">
+                                        <Setter TargetName="img" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!--<GridViewColumn  Header="Type" DisplayMemberBinding="{Binding Type}"/>-->
+                    <GridViewColumn Header="Size">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock x:Name="tb" HorizontalAlignment="Right" FontFamily="Consolas" Text="{Binding Size}" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Directory">
+                                        <Setter TargetName="tb" Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Date modified" DisplayMemberBinding="{Binding LastModDate }"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="lvRemoteDirs_MouseDoubleClick" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="txtInfo" Text="{Binding InfoStr, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FTPScreen}}}" 
+                           HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Visibility="Visible" TextWrapping="Wrap" TextChanged="txtInfo_TextChanged"/>
+    </Grid>
+</UserControl>
